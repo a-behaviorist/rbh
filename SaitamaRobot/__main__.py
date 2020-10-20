@@ -1,6 +1,7 @@
 import importlib
 import time
 import re
+import requests
 from sys import argv
 from typing import Optional
 
@@ -13,10 +14,10 @@ from SaitamaRobot.modules import ALL_MODULES
 from SaitamaRobot.modules.helper_funcs.chat_status import is_user_admin
 from SaitamaRobot.modules.helper_funcs.misc import paginate_modules
 from telegram import (InlineKeyboardButton, InlineKeyboardMarkup, ParseMode,
-                      Update)
+                      Update, Message, Chat, User, Bot)
 from telegram.error import (BadRequest, ChatMigrated, NetworkError,
                             TelegramError, TimedOut, Unauthorized)
-from telegram.ext import (CallbackContext, CallbackQueryHandler, CommandHandler,
+from telegram.ext import (CallbackContext, CallbackQueryHandler, CommandHandler, Defaults,
                           Filters, MessageHandler)
 from telegram.ext.dispatcher import DispatcherHandlerStop, run_async
 from telegram.utils.helpers import escape_markdown
@@ -51,21 +52,14 @@ def get_readable_time(seconds: int) -> str:
 
 
 PM_START_TEXT = """
-Hi {}, my name is {}! 
-I am an Anime themed group management bot.
-Build by weebs for weebs, I specialize in managing anime and similar themed groups.
+Hi hoe, my name is Rabbit Hoe! I am the boss hoe in Online Hoes groups. Sorry but I'm exclusive, so you can't use me in your groups :)
 You can find my list of available commands with /help.
 """
 
 HELP_STRINGS = """
-Hey there! My name is *{}*.
-I'm a Hero For Fun and help admins manage their groups with One Punch! Have a look at the following for an idea of some of \
-the things I can help you with.
-
 *Main* commands available:
  • /help: PM's you this message.
  • /help <module name>: PM's you info about that module.
- • /donate: information on how to donate!
  • /settings:
    • in PM: will send you your settings for all supported modules.
    • in a group: will redirect you to pm, with all that chat's settings.
@@ -77,10 +71,10 @@ And the following:
     dispatcher.bot.first_name, ""
     if not ALLOW_EXCL else "\nAll commands can either be used with / or !.\n")
 
-SAITAMA_IMG = "https://telegra.ph/file/46e6d9dfcb3eb9eae95d9.jpg"
+SAITAMA_IMG = "https://telegra.ph/file/c8d34cd487e7d1e932ffe.jpg"
 
 DONATE_STRING = """Heya, glad to hear you want to donate!
-Saitama is hosted on one of Kaizoku's Servers and doesn't require any donations as of now but \
+This bot's code is hosted on one of Kaizoku's Servers and doesn't require any donations as of now but \
 You can donate to the original writer of the Base code, Paul
 There are two ways of supporting him; [PayPal](paypal.me/PaulSonOfLars), or [Monzo](monzo.me/paulnionvestergaardlarsen)."""
 
@@ -189,23 +183,18 @@ def start(update: Update, context: CallbackContext):
                 reply_markup=InlineKeyboardMarkup(
                     [[
                         InlineKeyboardButton(
-                            text="☑️ Add Saitama to your group",
+                            text="🧿 Add me to your groups 🐰",
                             url="t.me/{}?startgroup=true".format(
                                 context.bot.username))
                     ],
                      [
                          InlineKeyboardButton(
-                             text="🚑 Support Group",
-                             url=f"https://t.me/{SUPPORT_CHAT}"),
+                             text="💌 DM Livvy",
+                             url=f"https://t.me/archangellivvy"),
                          InlineKeyboardButton(
-                             text="🔔 Updates Channel",
-                             url="https://t.me/OnePunchUpdates")
-                     ],
-                     [
-                         InlineKeyboardButton(
-                             text="🧾 Getting started guide",
-                             url="https://t.me/OnePunchUpdates/29")
-                     ],
+                             text="🔮 DM Mars",
+                             url="https://t.me/atriptomars")
+                    ],
                      [
                          InlineKeyboardButton(
                              text="🗄 Source code",
@@ -244,7 +233,7 @@ def error_callback(update: Update, context: CallbackContext):
         # the chat_id of a group has changed, use e.new_chat_id instead
     except TelegramError:
         print(error)
-        # handle all other telegram related errors
+        # handle all other telegram related errors    
 
 
 @run_async
@@ -516,7 +505,7 @@ def migrate_chats(update: Update, context: CallbackContext):
     raise DispatcherHandlerStop
 
 
-def main():
+def main(): 
     test_handler = CommandHandler("test", test)
     start_handler = CommandHandler("start", start)
 
@@ -538,9 +527,8 @@ def main():
     dispatcher.add_handler(help_callback_handler)
     dispatcher.add_handler(settings_callback_handler)
     dispatcher.add_handler(migrate_handler)
-    dispatcher.add_handler(donate_handler)
-
     dispatcher.add_error_handler(error_callback)
+    dispatcher.add_handler(donate_handler)
 
     if WEBHOOK:
         LOGGER.info("Using webhooks.")
