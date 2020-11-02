@@ -53,7 +53,7 @@ def get_readable_time(seconds: int) -> str:
 
 
 PM_START_TEXT = """
-Hi hoe, my name is Rabbit Hoe! I am the boss hoe in Online Hoes groups. Sorry but I'm exclusive, so you can't use me in your groups :)
+Hi *{}*, my name is *{}*! I am the boss hoe in Online Hoes groups. Sorry but I'm exclusive, so you can't use me in your groups :)
 You can find my list of available commands with /help.
 """
 
@@ -195,7 +195,7 @@ def start(update: Update, context: CallbackContext):
                 reply_markup=InlineKeyboardMarkup(
                     [[
                         InlineKeyboardButton(
-                            text="🧿 Add me to your groups 🐰",
+                            text="🧿 Add me to groups 🐰",
                             url="t.me/{}?startgroup=true".format(
                                 context.bot.username))
                     ],
