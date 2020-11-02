@@ -1,4 +1,5 @@
 import importlib
+import html
 import time
 import re
 import requests
@@ -134,6 +135,7 @@ def send_help(chat_id, text, keyboard=None):
         chat_id=chat_id,
         text=text,
         parse_mode=ParseMode.MARKDOWN,
+        disable_web_page_preview=True,
         reply_markup=keyboard)
 
 
@@ -153,6 +155,16 @@ def start(update: Update, context: CallbackContext):
         if len(args) >= 1:
             if args[0].lower() == "help":
                 send_help(update.effective_chat.id, HELP_STRINGS)
+            elif args[0].lower().startswith("ghelp_"):
+                mod = args[0].lower().split('_', 1)[1]
+                if not HELPABLE.get(mod, False):
+                    return
+                send_help(
+                    update.effective_chat.id, HELPABLE[mod].__help__,
+                    InlineKeyboardMarkup([[
+                        InlineKeyboardButton(
+                            text="Back", callback_data="help_back")
+                    ]]))
             elif args[0].lower() == "markdownhelp":
                 IMPORTED["extras"].markdown_help_sender(update)
             elif args[0].lower() == "disasters":
@@ -298,7 +310,17 @@ def get_help(update: Update, context: CallbackContext):
 
     # ONLY send help in PM
     if chat.type != chat.PRIVATE:
-
+        if len(args) >= 2 and any(args[1].lower() == x for x in HELPABLE):
+            module = args[1].lower()
+            update.effective_message.reply_text(
+                f"Contact me in PM to get help of {module.capitalize()}",
+                reply_markup=InlineKeyboardMarkup([[
+                    InlineKeyboardButton(
+                        text="Help",
+                        url="t.me/{}?start=ghelp_{}".format(
+                            context.bot.username, module))
+                ]]))
+            return
         update.effective_message.reply_text(
             "Contact me in PM to get the list of possible commands.",
             reply_markup=InlineKeyboardMarkup([[
@@ -510,7 +532,8 @@ def main():
     start_handler = CommandHandler("start", start)
 
     help_handler = CommandHandler("help", get_help)
-    help_callback_handler = CallbackQueryHandler(help_button, pattern=r"help_")
+    help_callback_handler = CallbackQueryHandler(
+        help_button, pattern=r"help_.*")
 
     settings_handler = CommandHandler("settings", get_settings)
     settings_callback_handler = CallbackQueryHandler(
